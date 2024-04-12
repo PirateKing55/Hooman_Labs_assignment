@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hooman Labs assignment</title>
+</head>
+
+<body>
+    <div>
+        <h2> Get List of Saved Addresses</h2>
+        <div>
+            <form action="/app/api/addresses" method="GET">
+                <label>Enter phone number:</label>
+                <input required type="number" name="phone_number" placeholder="+910000000000">
+                <br>
+                <button type="submit">Get List</button>
+            </form>
+        </div>
+        <div>
+            <% if (locals.addresses) { %>
+                <h3>Addresses</h3>
+                <% if(locals.addresses.length===0) {%>
+                    <p>No addresses found</p>
+                    <% } else { %>
+                        <ul>
+                            <% locals.addresses.forEach((address, index)=> { %>
+                                <li>
+                                    <strong>
+                                        <%=`Address ${index + 1}` %>
+                                    </strong>
+                                    <pre><%= JSON.stringify(address, null, 2) %></pre>
+                                </li>
+                                <% }) %>
+                        </ul>
+                        <% } %>
+                            <% } else if (locals.error) { %>
+                                <h3>Error</h3>
+                                <p>
+                                    <%= locals.error %>
+                                </p>
+                                <% } %>
+
+
+        </div>
+    </div>
+    <div>
+        <h2> Update Customer Address</h2>
+        <div>
+            <form id="updateAddressForm">
+                <label>Enter Customer ID:</label>
+                <input id="customer_id" required type="number" name="customer_id" placeholder="customer_id">
+                <br>
+                <label>Enter address ID:</label>
+                <input id="address_id" required type="number" name="address_id" placeholder="address_id">
+                <br>
+                <label>Enter updated address:</label>
+                <textarea id="address_data" required type="textarea" name="address_data"
+                    placeholder="address_data"></textarea>
+                <br>
+                <button type="submit">Update Address</button>
+            </form>
+        </div>
+        <div id="updateAddressDiv"></div>
+
+    </div>
+    <div>
+        <h2>Get Order List</h2>
+        <div>
+            <form action="/app/api/orders" method="GET">
+                <label>Enter phone number:</label>
+                <input required type="number" name="phone_number" placeholder="+910000000000">
+                <br>
+                <button type="submit">Get orders</button>
+            </form>
+        </div>
+        <div>
+            <% if (locals.orders) { %>
+                <h3>Orders</h3>
+                <% if(locals.orders.length===0) {%>
+                    <p>No orders found</p>
+                    <% } else { %>
+                        <ul>
+                            <% locals.orders.forEach((order, index)=> { %>
+                                <li>
+                                    <strong>
+                                        <%=`Order ${index + 1}` %>
+                                    </strong>
+                                    <pre><%= JSON.stringify(order, null, 2) %></pre>
+                                </li>
+                                <% }) %>
+                        </ul>
+                        <% } %>
+                            <% } else if (locals.error) { %>
+                                <h3>Error</h3>
+                                <p>
+                                    <%= locals.error %>
+                                </p>
+                                <% } %>
+
+
+        </div>
+    </div>
+    <div>
+        <h2> Get Order Details</h2>
+        <div>
+            <form action="/app/api/order" method="GET">
+                <label>Enter order ID:</label>
+                <input required type="number" name="orderId" placeholder="id">
+                <br>
+                <button type="submit">Get order</button>
+            </form>
+        </div>
+        <div>
+            <% if (locals.order) { %>
+                <h3>Order:</h3>
+                <pre><%= JSON.stringify(locals.order, null, 2) %></pre>
+
+                <% } else if (locals.error) { %>
+                    <h3>Error:</h3>
+                    <p>
+                        <%= locals.error %>
+                    </p>
+                    <% } %>
+
+
+        </div>
+    </div>
+
+    <div>
+        <h2>Cancel Order</h2>
+        <div>
+            <form action="/app/api/order/cancel" method="POST">
+                <label>Enter order ID:</label>
+                <input required type="number" name="orderId" placeholder="id">
+                <br>
+                <button type="submit">Cancel order</button>
+            </form>
+        </div>
+        <div>
+            <% if (locals.message) { %>
+                <h3>Message:</h3>
+                <pre><%= locals.message %></pre>
+
+                <% } else if (locals.error) { %>
+                    <h3>Error:</h3>
+                    <p>
+                        <%= locals.error %>
+                    </p>
+                    <% } %>
+
+
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById("updateAddressForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const customer_id = Number(document.getElementById("customer_id").value);
+            const address_id = Number(document.getElementById("address_id").value);
+            const address_data = JSON.parse(document.getElementById("address_data").value);
+
+            try {
+                const response = await fetch("/app/api/address/update", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        customer_id,
+                        address_id,
+                        address_data
+                    })
+                });
+                const data = await response.json();
+                console.log(data.message);
+                if (data.message) {
+                    document.getElementById("updateAddressDiv").innerHTML = `
+                    <h3>${data.message}</h3>
+                    <pre>${JSON.stringify(data.updatedAddress, null, 2)}</pre>`;
+                } else if (data.error) {
+                    document.getElementById("updateAddressDiv").innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${data.error}</p>`;
+                }
+            } catch (err) {
+                alert(err.message);
+                console.error(err);
+            }
+        }
+
+
+    </script>
+
+</body>
+
+</html>
