@@ -6,9 +6,7 @@ export const router = Router();
 router.put('/', async (req, res) => {
     try {
         // Fetching the address ID, customer ID and address data from the request body as per RESTful API standards for POST requests
-        const { address_id } = req.body;
-        const { customer_id } = req.body;
-        const { address_data } = req.body;
+        const { address_id, customer_id, address_data } = req.body;
 
         if (!address_id || !customer_id) {
             return res.status(400).json({ error: 'Address ID and Customer ID are required' });
